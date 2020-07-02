@@ -1,0 +1,17 @@
+[package]
+name = "proc-macro-tests"
+version = "0.1.0"
+authors = ["David Malinge <david.malinge@gmail.com>"]
+edition = "2018"
+
+[lib]
+proc-macro = true
+
+# [dev-dependencies]
+# trybuild = { version = "1.0.30", features = ["diff"] }
+
+[dependencies]
+syn = {version = "1.0.33", features = ["extra-traits"]}
+quote = "1.0.7"
+
+
