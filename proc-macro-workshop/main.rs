@@ -1,31 +1,19 @@
-// Write code here.
-//
-// To see what the code looks like after macro expansion:
-//     $ cargo expand
-//
-// To run the code:
-//     $ cargo run
+use seq::seq;
 
-// This test case should be a freebie if the previous ones are already working.
-// It shows that we can chain method calls on the builder.
-
-use derive_builder::Builder;
-
-#[derive(Builder)]
-pub struct Command {
-    executable: String,
-    #[builder(each = "arg")]
-    args: Vec<String>,
-    #[builder(each = "env")]
-    env: Vec<String>,
-    current_dir: Option<String>,
-}
+seq!(N in 16..=20 {
+    enum E {
+        #(
+            Variant#N,
+        )*
+    }
+});
 
 fn main() {
-    let command = Command::builder()
-        .executable("cargo".to_owned())
-        .arg("build".to_owned())
-        .arg("--release".to_owned())
-        .build()
-        .unwrap();
+    let e = E::Variant16;
+
+    let desc = match e {
+        E::Variant16 => "min",
+        E::Variant17 | E::Variant18 | E::Variant19 => "in between",
+        E::Variant20 => "max",
+    };
 }
