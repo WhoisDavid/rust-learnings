@@ -23,10 +23,10 @@ Also inspired by a long session on [proc macros](https://youtu.be/geovSK3wMB8) b
     - Source: [proc-macro-workshop/builder/src/lib.rs](proc-macro-workshop/builder/src/lib.rs)
   - [x] [**Derive macro:** `derive(CustomDebug)`](proc-macro-workshop/README.md#derive-macro-derivebuilder#derive-macro-derivecustomdebug)
     - Source: [proc-macro-workshop/debug/src/lib.rs](proc-macro-workshop/debug/src/lib.rs)
-  - [x] [**Function-like macro:** `seq!`](proc-macro-workshop/README.md#derive-macro-derivebuilder#function-like-macro-seq)
+  - [x] [**Function-like macro:** `seq!`](proc-macro-workshop/README.md#function-like-macro-seq)
     - Source: [proc-macro-workshop/seq-impl/src/lib.rs](proc-macro-workshop/seq-impl/src/lib.rs)
-  - [ ] [**Attribute macro:** `#[sorted]`](proc-macro-workshop/README.md#derive-macro-derivebuilder#attribute-macro-sorted)
-  - [ ] [**Attribute macro:** `#[bitfield]`](proc-macro-workshop/README.md#derive-macro-derivebuilder#attribute-macro-bitfield)
+  - [ ] [**Attribute macro:** `#[sorted]`](proc-macro-workshop/README.md#attribute-macro-sorted)
+  - [ ] [**Attribute macro:** `#[bitfield]`](proc-macro-workshop/README.md#attribute-macro-bitfield)
 
 
 *Project under [proc-macro-workshop](proc-macro-workshop).*
