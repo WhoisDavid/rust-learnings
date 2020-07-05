@@ -19,7 +19,7 @@ by other authors.*
   - [x] [**Derive macro:** `derive(CustomDebug)`](#derive-macro-derivecustomdebug)
       - Source: [debug/src/lib.rs](debug/src/lib.rs)
   - [x] [**Function-like macro:** `seq!`](#function-like-macro-seq)
-      - Source: [debug/src/lib.rs](seq-impl/src/lib.rs)
+      - Source: [seq-impl/src/lib.rs](seq-impl/src/lib.rs)
   - [ ] [**Attribute macro:** `#[sorted]`](#attribute-macro-sorted)
   - [ ] [**Attribute macro:** `#[bitfield]`](#attribute-macro-bitfield)
   - [ ] [**Project recommendations**](#project-recommendations) — What to work on

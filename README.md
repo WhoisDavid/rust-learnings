@@ -8,7 +8,7 @@
 
 ## Smart pointers
 
-Implementation of `std::cell`, `std::cell::RefCell` and `std::rc::Rc`.<br>
+Implementation of [`std::cell`](smart-pointers/src/cell.rs), [`std::cell::RefCell`](smart-pointers/src/refcell.rs) and [`std::rc::Rc`](smart-pointers/src/rc.rs).<br>
 This was done following a great [Crust of Rust](https://www.youtube.com/playlist?list=PLqbS7AVVErFiWDOAVrPt7aYmnuuOLYvOa) on [Smart Pointers and Interior Mutability](https://youtu.be/8O0Nt9qY_vo) by Jon Gjengset ([@jonhoo](https://github.com/jonhoo)).
 
 *Project under [smart-pointers](smart-pointers).*
