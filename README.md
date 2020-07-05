@@ -21,7 +21,8 @@ Also inspired by a long session on [proc macros](https://youtu.be/geovSK3wMB8) b
 #### Progress
   - [x] [**Derive macro:** `derive(Builder)`](proc-macro-workshop/README.md#derive-macro-derivebuilder) 
     - Source: [proc-macro-workshop/builder/src/lib.rs](proc-macro-workshop/builder/src/lib.rs)
-  - [ ] [**Derive macro:** `derive(CustomDebug)`](proc-macro-workshop/README.md#derive-macro-derivebuilder#derive-macro-derivecustomdebug)
+  - [x] [**Derive macro:** `derive(CustomDebug)`](proc-macro-workshop/README.md#derive-macro-derivebuilder#derive-macro-derivecustomdebug)
+    - Source: [proc-macro-workshop/debug/src/lib.rs](proc-macro-workshop/debug/src/lib.rs)
   - [x] [**Function-like macro:** `seq!`](proc-macro-workshop/README.md#derive-macro-derivebuilder#function-like-macro-seq)
     - Source: [proc-macro-workshop/seq-impl/src/lib.rs](proc-macro-workshop/seq-impl/src/lib.rs)
   - [ ] [**Attribute macro:** `#[sorted]`](proc-macro-workshop/README.md#derive-macro-derivebuilder#attribute-macro-sorted)

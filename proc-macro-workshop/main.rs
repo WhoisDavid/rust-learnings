@@ -1,19 +1,25 @@
-use seq::seq;
+use derive_debug::CustomDebug;
+use std::fmt::Debug;
 
-seq!(N in 16..=20 {
-    enum E {
-        #(
-            Variant#N,
-        )*
-    }
-});
+pub trait Trait {
+    type Value;
+}
+
+#[derive(CustomDebug)]
+#[debug(bound = "T::Value: Debug")]
+pub struct Wrapper<T: Trait> {
+    field: Field<T>,
+}
+
+#[derive(CustomDebug)]
+struct Field<T: Trait> {
+    values: Vec<T::Value>,
+}
 
 fn main() {
-    let e = E::Variant16;
+    struct Id;
 
-    let desc = match e {
-        E::Variant16 => "min",
-        E::Variant17 | E::Variant18 | E::Variant19 => "in between",
-        E::Variant20 => "max",
-    };
+    impl Trait for Id {
+        type Value = u8;
+    }
 }

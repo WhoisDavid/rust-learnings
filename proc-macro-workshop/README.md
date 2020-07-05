@@ -15,8 +15,11 @@ by other authors.*
 - [**Suggested prerequisites**](#suggested-prerequisites)
 - [**Projects**](#projects) — Introduction to each of the projects
   - [x] [**Derive macro:** `derive(Builder)`](#derive-macro-derivebuilder)
-  - [ ] [**Derive macro:** `derive(CustomDebug)`](#derive-macro-derivecustomdebug)
-  - [ ] [**Function-like macro:** `seq!`](#function-like-macro-seq)
+      - Source: [builder/src/lib.rs](builder/src/lib.rs)
+  - [x] [**Derive macro:** `derive(CustomDebug)`](#derive-macro-derivecustomdebug)
+      - Source: [debug/src/lib.rs](debug/src/lib.rs)
+  - [x] [**Function-like macro:** `seq!`](#function-like-macro-seq)
+      - Source: [debug/src/lib.rs](seq-impl/src/lib.rs)
   - [ ] [**Attribute macro:** `#[sorted]`](#attribute-macro-sorted)
   - [ ] [**Attribute macro:** `#[bitfield]`](#attribute-macro-bitfield)
   - [ ] [**Project recommendations**](#project-recommendations) — What to work on
