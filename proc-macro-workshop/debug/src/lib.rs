@@ -80,7 +80,7 @@ pub fn derive(input: TokenStream) -> TokenStream {
                 other => unimplemented!("Unimplemented attribute {:?}", other),
             }
         }
-        return String::from("{:?}");
+        String::from("{:?}")
     });
 
     // See: https://docs.rs/syn/1.0.33/syn/struct.Generics.html#impl-1
@@ -99,7 +99,7 @@ fn attr_error<T: quote::ToTokens>(tokens: T) -> syn::Error {
     syn::Error::new_spanned(tokens, "expected `debug(bound = \"...\")`")
 }
 
-fn get_attr<'a>(attr_ident: &str, attrs: Vec<syn::Attribute>) -> Option<syn::Attribute> {
+fn get_attr(attr_ident: &str, attrs: Vec<syn::Attribute>) -> Option<syn::Attribute> {
     for attr in attrs {
         if attr.path.segments.len() == 1 && attr.path.segments[0].ident == attr_ident {
             return Some(attr);
@@ -226,7 +226,7 @@ fn inner_type<'a>(ty: &'a syn::Type, outer_type: Option<&str>) -> Option<&'a syn
 
 fn get_associated_types<'a>(
     ty: &'a syn::Type,
-    generic_types: &Vec<&syn::Ident>,
+    generic_types: &[&syn::Ident],
 ) -> Option<&'a syn::TypePath> {
     if let Some(inner_ty) = inner_type(ty, None) {
         return get_associated_types(inner_ty, generic_types);
