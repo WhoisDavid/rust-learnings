@@ -1,6 +1,6 @@
 [package]
 name = "sorted"
-version = "0.0.0"
+version = "1.0.0"
 edition = "2018"
 autotests = false
 publish = false
@@ -16,4 +16,5 @@ path = "tests/progress.rs"
 trybuild = { version = "1.0", features = ["diff"] }
 
 [dependencies]
-# TODO
+syn = { version = "1.0.33", features = ["full", "visit-mut"] }
+quote = "1.0.7"

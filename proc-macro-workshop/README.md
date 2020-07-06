@@ -15,14 +15,15 @@ by other authors.*
 - [**Suggested prerequisites**](#suggested-prerequisites)
 - [**Projects**](#projects) — Introduction to each of the projects
   - [x] [**Derive macro:** `derive(Builder)`](#derive-macro-derivebuilder)
-      - Source: [builder/src/lib.rs](builder/src/lib.rs)
+    - Source: [builder/src/lib.rs](builder/src/lib.rs)
   - [x] [**Derive macro:** `derive(CustomDebug)`](#derive-macro-derivecustomdebug)
-      - Source: [debug/src/lib.rs](debug/src/lib.rs)
+    - Source: [debug/src/lib.rs](debug/src/lib.rs)
   - [x] [**Function-like macro:** `seq!`](#function-like-macro-seq)
-      - Source: [seq-impl/src/lib.rs](seq-impl/src/lib.rs)
-  - [ ] [**Attribute macro:** `#[sorted]`](#attribute-macro-sorted)
+    - Source: [seq-impl/src/lib.rs](seq-impl/src/lib.rs)
+  - [x] [**Attribute macro:** `#[sorted]`](#attribute-macro-sorted)
+    - Source: [sorted/src/lib.rs](sorted/src/lib.rs)
   - [ ] [**Attribute macro:** `#[bitfield]`](#attribute-macro-bitfield)
-  - [ ] [**Project recommendations**](#project-recommendations) — What to work on
+- [**Project recommendations**](#project-recommendations) — What to work on
     depending on your interests
 - [**Test harness**](#test-harness) — Explanation of how testing is set up
 - [**Workflow**](#workflow) — Recommended way to work through the workshop

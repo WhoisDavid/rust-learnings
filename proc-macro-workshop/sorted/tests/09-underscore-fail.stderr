@@ -1,0 +1,23 @@
+error: Elsewhere should sort before Europe
+  --> $DIR/09-underscore-fail.rs:21:5
+   |
+21 |     Elsewhere,
+   |     ^^^^^^^^^
+
+error: Wildcard pattern `_` should be last in match
+  --> $DIR/09-underscore-fail.rs:33:13
+   |
+33 |             _ => Elsewhere,
+   |             ^
+
+error: RustFest should sort before RustLatam
+  --> $DIR/09-underscore-fail.rs:39:21
+   |
+39 |                     RustFest => Europe,
+   |                     ^^^^^^^^
+
+error: RustConf should sort before RustFest
+  --> $DIR/09-underscore-fail.rs:48:13
+   |
+48 |             RustConf => US,
+   |             ^^^^^^^^

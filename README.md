@@ -25,7 +25,8 @@ Also inspired by a long session on [proc macros](https://youtu.be/geovSK3wMB8) b
     - Source: [proc-macro-workshop/debug/src/lib.rs](proc-macro-workshop/debug/src/lib.rs)
   - [x] [**Function-like macro:** `seq!`](proc-macro-workshop/README.md#function-like-macro-seq)
     - Source: [proc-macro-workshop/seq-impl/src/lib.rs](proc-macro-workshop/seq-impl/src/lib.rs)
-  - [ ] [**Attribute macro:** `#[sorted]`](proc-macro-workshop/README.md#attribute-macro-sorted)
+  - [x] [**Attribute macro:** `#[sorted]`](proc-macro-workshop/README.md#attribute-macro-sorted)
+    - Source: [proc-macro-workshop/sorted/src/lib.rs](proc-macro-workshop/sorted/src/lib.rs)
   - [ ] [**Attribute macro:** `#[bitfield]`](proc-macro-workshop/README.md#attribute-macro-bitfield)
 
 
