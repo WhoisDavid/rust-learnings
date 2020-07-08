@@ -1,5 +1,8 @@
-error[E0277]: the trait bound `bitfield::checks::SevenMod8: bitfield::checks::TotalSizeIsMultipleOfEightBits` is not satisfied
-  --> $DIR/04-multiple-of-8bits.rs:53:1
+error: any use of this value will cause an error
+  --> $DIR/04-multiple-of-8bits.rs:54:1
    |
-53 | #[bitfield]
-   | ^^^^^^^^^^^ the trait `bitfield::checks::TotalSizeIsMultipleOfEightBits` is not implemented for `bitfield::checks::SevenMod8`
+54 | #[bitfield]
+   | ^^^^^^^^^^^ the evaluated program panicked at '#[bitfield] on `NotQuiteFourBytes` requires the total bit size to be a multiple of 8 bits.', $DIR/tests/04-multiple-of-8bits.rs:54:1
+   |
+   = note: `#[deny(const_err)]` on by default
+   = note: this error originates in a macro (in Nightly builds, run with -Z macro-backtrace for more info)

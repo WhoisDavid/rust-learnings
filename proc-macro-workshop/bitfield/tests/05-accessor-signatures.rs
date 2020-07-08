@@ -2,6 +2,7 @@
 // the narrowest unsigned integer type that can hold the right number of bits.
 // That means the accessors for B1 through B8 would use u8, B9 through B16 would
 // use u16 etc.
+#![cfg_attr(feature = "nightly", feature(const_panic))]
 
 use bitfield::*;
 use std::mem::size_of_val;

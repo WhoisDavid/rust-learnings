@@ -10,6 +10,7 @@
 //
 // Don't worry for now what happens if the total bit size is not a multiple of
 // 8 bits. We will come back to that later to make it a compile-time error.
+#![cfg_attr(feature = "nightly", feature(const_panic))]
 
 use bitfield::*;
 

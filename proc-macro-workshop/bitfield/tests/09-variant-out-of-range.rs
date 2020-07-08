@@ -1,5 +1,6 @@
 // Bitfield enums with any discriminant (implicit or explicit) outside of the
 // range 0..2^BITS should fail to compile.
+#![cfg_attr(feature = "nightly", feature(const_panic))]
 
 use bitfield::*;
 

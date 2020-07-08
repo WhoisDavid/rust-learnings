@@ -13,6 +13,7 @@
 // Do not worry about what happens if discriminants are outside of the range
 // 0..2^BITS. We will do a compile-time check in a later test case to ensure
 // they are in range.
+#![cfg_attr(feature = "nightly", feature(const_panic))]
 
 use bitfield::*;
 

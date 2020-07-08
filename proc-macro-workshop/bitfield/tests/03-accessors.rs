@@ -17,7 +17,7 @@
 // If it's easier for now, you can use u64 as the argument type for all the
 // setters and return type for all the getters. We will follow up with a more
 // precise signature in a later test case.
-
+#![cfg_attr(feature = "nightly", feature(const_panic))]
 use bitfield::*;
 
 #[bitfield]

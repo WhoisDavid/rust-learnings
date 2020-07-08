@@ -1,3 +1,5 @@
+#![cfg_attr(feature = "nightly", feature(const_panic))]
+
 // Crates that have the "proc-macro" crate type are only allowed to export
 // procedural macros. So we cannot have one crate that defines procedural macros
 // alongside other types of public APIs like traits and structs.
@@ -10,6 +12,16 @@
 //
 // From the perspective of a user of this crate, they get all the necessary APIs
 // (macro, trait, struct) through the one bitfield crate.
-pub use bitfield_impl::bitfield;
 
-// TODO other things
+pub use bitfield_impl::bitfield;
+pub use bitfield_impl::generate_bit_specifiers;
+
+pub trait Specifier {
+    const BITS: usize;
+    type TYPE: From<u8> + std::ops::Shl<usize, Output = Self::TYPE> + std::ops::AddAssign;
+
+    fn get(data: &[u8], offset: usize) -> Self::TYPE;
+    fn set(data: &mut [u8], offset: usize, val: Self::TYPE);
+}
+
+generate_bit_specifiers!();

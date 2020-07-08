@@ -42,6 +42,7 @@
 // more about every other part of Rust will. Inversely, once you come up with
 // what code you want to generate, writing the macro to generate it is generally
 // the easy part.
+#![cfg_attr(feature = "nightly", feature(const_panic))]
 
 use bitfield::*;
 

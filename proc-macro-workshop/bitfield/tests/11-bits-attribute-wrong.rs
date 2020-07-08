@@ -3,6 +3,7 @@
 //
 // Ensure that the error message points to the incorrect attribute and contains
 // the correct number of bits in some form.
+#![cfg_attr(feature = "nightly", feature(const_panic))]
 
 use bitfield::*;
 

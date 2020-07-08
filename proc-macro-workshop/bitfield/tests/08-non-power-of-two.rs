@@ -4,6 +4,7 @@
 // (Or, if you implemented the optional #[bits = N] enum approach mentioned in
 // the explanation of test case 06, then enums with non-power-of-two variants
 // without a #[bits = N] attribute should fail to compile.)
+#![cfg_attr(feature = "nightly", feature(const_panic))]
 
 use bitfield::*;
 

@@ -18,6 +18,7 @@
 // meaning that the code behaves the same whether or not you write it, but if
 // the user does provide the attribute then the program must not compile if
 // their value is wrong.
+#![cfg_attr(feature = "nightly", feature(const_panic))]
 
 use bitfield::*;
 

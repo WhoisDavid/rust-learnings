@@ -45,6 +45,7 @@
 //
 //     bitfield.set_small_prime(SmallPrime::Seven);
 //     let p = bitfield.small_prime().unwrap_or(SmallPrime::Two);
+#![cfg_attr(feature = "nightly", feature(const_panic))]
 
 use bitfield::*;
 

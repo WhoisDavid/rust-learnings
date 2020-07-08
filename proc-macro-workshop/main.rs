@@ -1,25 +1,12 @@
-use derive_debug::CustomDebug;
-use std::fmt::Debug;
+#![cfg_attr(feature = "nightly", feature(const_panic))]
+use bitfield::*;
 
-pub trait Trait {
-    type Value;
+#[bitfield]
+pub struct MyFourBytes {
+    a: B1,
+    b: B3,
+    c: B4,
+    d: B24,
 }
 
-#[derive(CustomDebug)]
-#[debug(bound = "T::Value: Debug")]
-pub struct Wrapper<T: Trait> {
-    field: Field<T>,
-}
-
-#[derive(CustomDebug)]
-struct Field<T: Trait> {
-    values: Vec<T::Value>,
-}
-
-fn main() {
-    struct Id;
-
-    impl Trait for Id {
-        type Value = u8;
-    }
-}
+fn main() {}
