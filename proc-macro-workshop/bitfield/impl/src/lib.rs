@@ -179,7 +179,7 @@ fn getters_setters(fields: &syn::Fields) -> TokenStream {
 pub fn derive_bitfield_specifier(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
-    let ident = ast.ident;
+    let enum_ident = ast.ident;
 
     // No attributes
     let attrs = ast.attrs;
@@ -188,53 +188,59 @@ pub fn derive_bitfield_specifier(input: proc_macro::TokenStream) -> proc_macro::
     let variants = match ast.data {
         syn::Data::Enum(e) => e.variants,
         // Struct / Union
-        other => unimplemented!(
-            "BitfieldSpecifier only supports Enum and is not implemented for {:?}",
-            other
-        ),
+        _ => {
+            return syn::Error::new_spanned(enum_ident, "BitfieldSpecifier only supports enum")
+                .to_compile_error()
+                .into()
+        }
     };
 
     // Check that the number of variants is a power of two
     let variant_count = variants.len();
     if !variant_count.is_power_of_two() {
-        return syn::Error::new_spanned(
-            ident,
-            "Enum variants for BitfieldSpecifier need to be a power of two",
+        return syn::Error::new(
+            proc_macro2::Span::call_site(),
+            "BitfieldSpecifier expected a number of variants which is a power of 2",
         )
         .to_compile_error()
         .into();
     }
 
-    // Build match patterns for variants
-    let match_variants = variants.iter().map(|var| {
-        let ident = &var.ident;
-        // let discriminant = var.discriminant.as_ref().expect("Expect discriminant");
-        if let Some((_, ref expr)) = var.discriminant {
-            quote!( #expr => Self::#ident )
-        } else {
-            // See https://doc.rust-lang.org/std/mem/fn.discriminant.html
-            // std::mem::discriminant
-            syn::Error::new_spanned(var, "Expected discriminant").to_compile_error()
-        }
-    });
-
     // Number of bits (i.e. which power of two) is the number of trailing zeros
     let bits = variant_count.trailing_zeros() as usize;
     let size_type = size_to_type(bits);
 
+    // Build match patterns for variants
+    let match_variants = variants.iter().map(|var| {
+        let ident = &var.ident;
+
+        // Create a new ident `enum_variant` to be used in the match patterns
+        let other_ident = syn::Ident::new(
+            &format!(
+                "{}_{}",
+                enum_ident.to_string().to_lowercase(),
+                ident.to_string().to_lowercase()
+            ),
+            ident.span(),
+        );
+        // Rely on x if x == Enum::Variant
+        quote!( #other_ident if #other_ident == Self::#ident as Self::IntType => Self::#ident )
+    });
+
     quote!(
-        impl From<#ident> for #size_type {
-            fn from(x: #ident) -> #size_type {
+        impl From<#enum_ident> for #size_type {
+            fn from(x: #enum_ident) -> #size_type {
                 x as #size_type
             }
         }
 
-        impl Specifier for #ident {
+        impl Specifier for #enum_ident {
             const BITS: usize = #bits;
             type IntType = #size_type;
             type Interface = Self;
 
             fn to_interface(int_val: Self::IntType) -> Self::Interface {
+                // #(#unknown_discriminant)*
                 match int_val {
                     #(#match_variants),*,
                     _ => panic!("Not supported"),

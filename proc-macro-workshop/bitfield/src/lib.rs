@@ -18,6 +18,7 @@ pub use bitfield_impl::generate_bit_specifiers;
 pub use bitfield_impl::BitfieldSpecifier;
 
 pub trait LastByte {
+    // Returns the last byte (least significant byte) of `Self`
     fn last_byte(self) -> u8;
 }
 
@@ -94,6 +95,5 @@ impl Specifier for bool {
         }
     }
 }
-
 
 generate_bit_specifiers!();

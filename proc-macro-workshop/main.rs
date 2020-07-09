@@ -16,16 +16,24 @@ pub enum TriggerMode {
     Level = 1,
 }
 
-#[derive(BitfieldSpecifier)]
-pub enum DeliveryMode {
-    Fixed = 0b000,
-    Lowest = 0b001,
-    SMI = 0b010,
-    RemoteRead = 0b011,
-    NMI = 0b100,
-    Init = 0b101,
-    Startup = 0b110,
-    External = 0b111,
+#[bitfield]
+pub struct RedirectionTableEntry {
+    delivery_mode: DeliveryMode,
+    reserved: B5,
 }
 
+const F: isize = 3;
+const G: isize = 0;
+
+#[derive(BitfieldSpecifier)]
+pub enum DeliveryMode {
+    Fixed = F,
+    Lowest,
+    SMI,
+    RemoteRead,
+    NMI,
+    Init = G,
+    Startup,
+    External,
+}
 fn main() {}
