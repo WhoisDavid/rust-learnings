@@ -15,13 +15,85 @@
 
 pub use bitfield_impl::bitfield;
 pub use bitfield_impl::generate_bit_specifiers;
+pub use bitfield_impl::BitfieldSpecifier;
+
+pub trait LastByte {
+    fn last_byte(self) -> u8;
+}
 
 pub trait Specifier {
     const BITS: usize;
-    type TYPE: From<u8> + std::ops::Shl<usize, Output = Self::TYPE> + std::ops::AddAssign;
+    type IntType: From<u8>
+        + From<Self::Interface>
+        + Copy
+        + LastByte
+        + std::ops::Shl<usize, Output = Self::IntType>
+        + std::ops::Shr<usize, Output = Self::IntType>
+        + std::ops::AddAssign
+        + std::ops::SubAssign;
+    type Interface;
 
-    fn get(data: &[u8], offset: usize) -> Self::TYPE;
-    fn set(data: &mut [u8], offset: usize, val: Self::TYPE);
+    fn to_interface(int_val: Self::IntType) -> Self::Interface;
+    // fn to_int_type(interface: Self::Interface) -> Self::IntType;
+
+    fn get(data: &[u8], mut offset: usize) -> Self::Interface {
+        let mut byte_idx = (offset + 1) / 8;
+        offset %= 8;
+        let mut remaining_bits = Self::BITS;
+        let mut out: Self::IntType = Self::IntType::from(0);
+        while remaining_bits > 0 {
+            let bits_in_current_byte = std::cmp::min(remaining_bits, 8 - offset);
+            let new_byte: u8 = if bits_in_current_byte == 8 {
+                data[byte_idx]
+            } else {
+                data[byte_idx].mid(offset, bits_in_current_byte) >> offset
+            };
+            out += Self::IntType::from(new_byte) << (Self::BITS - remaining_bits);
+            remaining_bits -= bits_in_current_byte;
+            byte_idx += 1;
+            offset = 0;
+        }
+        Self::to_interface(out)
+    }
+
+    fn set(data: &mut [u8], mut offset: usize, val: Self::Interface) {
+        let mut byte_idx = (offset + 1) / 8;
+        offset %= 8;
+        let bits = Self::BITS;
+        let mut remaining_bits = bits;
+        let mut val_int = Self::IntType::from(val);
+        while remaining_bits > 0 {
+            let bits_in_current_byte = std::cmp::min(remaining_bits, 8 - offset);
+            let new_byte: u8 = if bits_in_current_byte == 8 {
+                // Truncates the u8 values
+                val_int.last_byte()
+            } else {
+                let previous_bits = data[byte_idx].first(offset);
+                let next_bits = data[byte_idx].last(8 - bits_in_current_byte);
+                previous_bits + (val_int.last_byte() << offset) + next_bits
+            };
+            data[byte_idx] = new_byte;
+            val_int -= Self::IntType::from(new_byte) >> bits_in_current_byte;
+            remaining_bits -= bits_in_current_byte;
+            byte_idx += 1;
+            offset = 0;
+        }
+    }
 }
+
+impl Specifier for bool {
+    const BITS: usize = 1;
+    type IntType = u8;
+    type Interface = Self;
+
+    fn to_interface(int_val: Self::IntType) -> Self::Interface {
+        match int_val {
+            0 => false,
+            1 => true,
+            _ => panic!("Should be 0 or 1"),
+        }
+    }
+}
+
 
 generate_bit_specifiers!();

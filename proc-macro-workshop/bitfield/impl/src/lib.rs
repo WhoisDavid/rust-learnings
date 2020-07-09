@@ -2,7 +2,6 @@
 
 extern crate proc_macro;
 
-// use proc_macro::TokenStream;
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::parse_macro_input;
@@ -13,62 +12,40 @@ use syn::Item;
 pub fn generate_bit_specifiers(_input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let mut output = TokenStream::new();
 
+    let int_types = [
+        quote!(u8),
+        quote!(u16),
+        quote!(u32),
+        quote!(u64),
+        quote!(u128),
+    ];
+
+    let last_byte = quote!(
+        #(impl LastByte for #int_types {
+            fn last_byte(self) -> u8 {
+                self as u8
+            }
+        })*
+    );
+    output.extend(last_byte);
+
     let bit_specifiers = (1usize..=64).map(|idx| {
         let ident = syn::Ident::new(&format!("B{}", idx), proc_macro2::Span::call_site());
         let size_type = size_to_type(idx);
         quote! (
-                pub enum #ident {}
-                impl Specifier for #ident {
-                    const BITS: usize = #idx;
-                    type TYPE = #size_type;
+            pub enum #ident {}
+            impl Specifier for #ident {
+                const BITS: usize = #idx;
+                type IntType = #size_type;
+                type Interface = #size_type;
 
-                    fn get(data: &[u8], mut offset: usize) -> Self::TYPE {
-                        let mut byte_idx = (offset + 1) / 8;
-                        offset %= 8;
-                        let mut remaining_bits = Self::BITS;
-                        let mut out: Self::TYPE = 0;
-                        while remaining_bits > 0 {
-                            let bits_in_current_byte = std::cmp::min(remaining_bits, 8 - offset);
-                            let new_byte: u8 = if bits_in_current_byte == 8 {
-                                data[byte_idx]
-                            } else {
-                                let mask = (1 << bits_in_current_byte) - 1 << offset;
-                                data[byte_idx].mid(offset, bits_in_current_byte) >> offset
-                            };
-                            out += (new_byte as Self::TYPE) << (Self::BITS - remaining_bits);
-
-                            remaining_bits -= bits_in_current_byte;
-                            byte_idx += 1;
-                            offset = 0;
-                        }
-                        return out;
-                    }
-
-                    fn set(data: &mut [u8], mut offset: usize, mut val: Self::TYPE) {
-                        let mut byte_idx = (offset + 1) / 8;
-                        offset %= 8;
-                        let bits = Self::BITS;
-                        let mut remaining_bits = bits;
-                        while remaining_bits > 0 {
-                            let bits_in_current_byte = std::cmp::min(remaining_bits, 8 - offset);
-                            let new_byte: u8 = if bits_in_current_byte == 8 {
-                                // Truncates the u8 values
-                                (val as u8)
-                            } else {
-                                let previous_bits = data[byte_idx].first(offset);
-                                let next_bits = data[byte_idx].last(8 - bits_in_current_byte);
-                                previous_bits + ((val as u8) << offset) + next_bits
-                            };
-                            data[byte_idx] = new_byte;
-                            val -= (new_byte as Self::TYPE) >> bits_in_current_byte;
-                            remaining_bits -= bits_in_current_byte;
-                            byte_idx += 1;
-                            offset = 0;
-                        }
-                    }
+                fn to_interface(int_val: Self::IntType) -> Self::Interface {
+                    int_val as Self::Interface
                 }
+            }
         )
     });
+
     output.extend(bit_ops_impl());
     output.extend(bit_specifiers);
     output.into()
@@ -147,6 +124,7 @@ pub fn bitfield(
                     data: [u8; ( #size ) / 8],
                 }
 
+                // Conditional consts and panic in const requires nightly
                 #[cfg(feature="nightly")]
                 const _: usize = if ( ( #size ) % 8 == 0 ) {
                     0
@@ -179,12 +157,12 @@ fn getters_setters(fields: &syn::Fields) -> TokenStream {
         let to = quote!((#offset + <#ty as Specifier>::BITS));
 
         let getter = quote!(
-            pub fn #get_ident(&self) -> <#ty as Specifier>::TYPE {
+            pub fn #get_ident(&self) -> <#ty as Specifier>::Interface {
                 // self.get::<#ty>(#offset)
                 #ty::get(&self.data, #offset)
             }
 
-            pub fn #set_ident(&mut self, val: <#ty as Specifier>::TYPE) {
+            pub fn #set_ident(&mut self, val: <#ty as Specifier>::Interface) {
                 //self.data[#offset..#to] = val;
                 #ty::set(&mut self.data, #offset, val)
             }
@@ -197,58 +175,72 @@ fn getters_setters(fields: &syn::Fields) -> TokenStream {
     output
 }
 
-// fn _expand_generic_get() -> TokenStream {
-//     quote!(
-//         fn get<T: Specifier>(&self, mut offset: usize) -> <T as Specifier>::TYPE {
-//             let mut byte_idx = (offset + 1) / 8;
-//             offset %= 8;
-//             let bits = <T as Specifier>::BITS;
-//             let mut remaining_bits = bits;
-//             let mut out = <T as Specifier>::TYPE::from(0);
+#[proc_macro_derive(BitfieldSpecifier)]
+pub fn derive_bitfield_specifier(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let ast = parse_macro_input!(input as syn::DeriveInput);
 
-//             while remaining_bits > 0 {
-//                 let bits_in_current_byte = std::cmp::min(remaining_bits, 8) - offset;
-//                 let new_byte = if bits_in_current_byte == 8 {
-//                     self.data[byte_idx]
-//                 } else {
-//                     let mask = (1 << bits_in_current_byte) - 1 << offset;
-//                     (self.data[byte_idx] & mask) >> offset
-//                 };
-//                 out += <T as Specifier>::TYPE::from(new_byte) << (bits - remaining_bits);
+    let ident = ast.ident;
 
-//                 remaining_bits -= bits_in_current_byte;
-//                 byte_idx += 1;
-//                 offset = 0;
-//             }
-//             return out;
-//         }
-//     )
-// }
+    // No attributes
+    let attrs = ast.attrs;
+    assert!(attrs.is_empty());
 
-// fn expand_generic_set() -> TokenStream {
-//     quote!(
-//         fn set<T: Specifier>(&mut self, offset: usize, val: <T as Specifier>::TYPE) {
-//             let mut byte_idx = offset / 8;
-//             offset %= 8;
-//             let bits = <T as Specifier>::BITS;
-//             let mut remaining_bits = bits;
-//             let mut out = <T as Specifier>::TYPE::from(0);
+    let variants = match ast.data {
+        syn::Data::Enum(e) => e.variants,
+        // Struct / Union
+        other => unimplemented!(
+            "BitfieldSpecifier only supports Enum and is not implemented for {:?}",
+            other
+        ),
+    };
 
-//             while remaining_bits > 0 {
-//                 let bits_in_current_byte = std::cmp::min(remaining_bits, 8) - offset;
-//                 let mut new_byte = if bits_in_current_byte == 8 {
-//                     self.data[byte_idx]
-//                 } else {
-//                     let mask = (1 << bits_in_current_byte) - 1 << offset;
-//                     (self.data[byte_idx] & mask) >> offset
-//                 };
-//                 out += <T as Specifier>::TYPE::from(new_byte) << (bits - remaining_bits);
+    // Check that the number of variants is a power of two
+    let variant_count = variants.len();
+    if !variant_count.is_power_of_two() {
+        return syn::Error::new_spanned(
+            ident,
+            "Enum variants for BitfieldSpecifier need to be a power of two",
+        )
+        .to_compile_error()
+        .into();
+    }
 
-//                 remaining_bits -= bits_in_current_byte;
-//                 byte_idx += 1;
-//                 offset = 0;
-//             }
-//             return out;
-//         }
-//     )
-// }
+    // Build match patterns for variants
+    let match_variants = variants.iter().map(|var| {
+        let ident = &var.ident;
+        // let discriminant = var.discriminant.as_ref().expect("Expect discriminant");
+        if let Some((_, ref expr)) = var.discriminant {
+            quote!( #expr => Self::#ident )
+        } else {
+            // See https://doc.rust-lang.org/std/mem/fn.discriminant.html
+            // std::mem::discriminant
+            syn::Error::new_spanned(var, "Expected discriminant").to_compile_error()
+        }
+    });
+
+    // Number of bits (i.e. which power of two) is the number of trailing zeros
+    let bits = variant_count.trailing_zeros() as usize;
+    let size_type = size_to_type(bits);
+
+    quote!(
+        impl From<#ident> for #size_type {
+            fn from(x: #ident) -> #size_type {
+                x as #size_type
+            }
+        }
+
+        impl Specifier for #ident {
+            const BITS: usize = #bits;
+            type IntType = #size_type;
+            type Interface = Self;
+
+            fn to_interface(int_val: Self::IntType) -> Self::Interface {
+                match int_val {
+                    #(#match_variants),*,
+                    _ => panic!("Not supported"),
+                }
+            }
+        }
+    )
+    .into()
+}
