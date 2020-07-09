@@ -211,8 +211,8 @@ pub fn derive_bitfield_specifier(input: proc_macro::TokenStream) -> proc_macro::
     let size_type = size_to_type(bits);
 
     // Build match patterns for variants
-    let match_variants = variants.iter().map(|var| {
-        let ident = &var.ident;
+    let match_variants = variants.iter().map(|variant| {
+        let ident = &variant.ident;
 
         // Create a new ident `enum_variant` to be used in the match patterns
         let other_ident = syn::Ident::new(
@@ -227,7 +227,27 @@ pub fn derive_bitfield_specifier(input: proc_macro::TokenStream) -> proc_macro::
         quote!( #other_ident if #other_ident == Self::#ident as Self::IntType => Self::#ident )
     });
 
+    let enum_variants = variants.iter().map(|variant| {
+        let ident = &variant.ident;
+        quote!( #enum_ident::#ident  )
+    });
+
+    let error = format!(
+        "\nError in BitfieldSpecifier for {}.\nBitfieldSpecifier expects discriminants in the range 0..2^BITS.\nOutside of range:",
+        enum_ident.to_string()
+    );
+
     quote!(
+        #(
+            // Conditional consts and panic in const requires nightly
+            // #[cfg(feature="nightly")]
+            const _: usize = if ( (#enum_variants as usize) < #variant_count) {
+                0
+            }else{
+                panic!(concat!(#error, stringify!(#enum_variants), " >= ", #variant_count, "\n"))
+            };
+        )*
+
         impl From<#enum_ident> for #size_type {
             fn from(x: #enum_ident) -> #size_type {
                 x as #size_type

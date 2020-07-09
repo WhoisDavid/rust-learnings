@@ -1,5 +1,12 @@
-error[E0277]: the trait bound `bitfield::checks::False: bitfield::checks::DiscriminantInRange` is not satisfied
-  --> $DIR/09-variant-out-of-range.rs:17:5
-   |
-17 |     External,
-   |     ^^^^^^^^ the trait `bitfield::checks::DiscriminantInRange` is not implemented for `bitfield::checks::False`
+error: any use of this value will cause an error
+ --> $DIR/09-variant-out-of-range.rs:9:10
+  |
+9 | #[derive(BitfieldSpecifier)]
+  |          ^^^^^^^^^^^^^^^^^ the evaluated program panicked at '
+Error in BitfieldSpecifier for DeliveryMode.
+BitfieldSpecifier expects discriminants in the range 0..2^BITS.
+Outside of range:DeliveryMode :: External >= 8
+', $DIR/tests/09-variant-out-of-range.rs:9:10
+  |
+  = note: `#[deny(const_err)]` on by default
+  = note: this error originates in a macro (in Nightly builds, run with -Z macro-backtrace for more info)
