@@ -72,33 +72,42 @@ fn bit_ops_impl() -> TokenStream {
 
         impl BitOps for u8 {
             fn first(self, n: usize) -> u8 {
-                if n >= 8 {
-                    self
-                } else {
-                    self & ((1 << n) - 1)
+                match n {
+                    0 => 0,
+                    1..=7 => self & ((1 << n) - 1),
+                    _ => self
                 }
             }
 
             fn last(self, n: usize) -> u8 {
-                if n >= 8 {
-                    self
-                } else {
-                    // u8::MAX - (1 << (8-n)) + 1
-                    self & !((1 << (8-n)) - 1)
+                match n {
+                    0 => 0,
+                    1..=7 => self & !((1 << (8-n)) - 1),
+                    _ => self
                 }
             }
 
             fn mid(self, start: usize, len: usize) -> u8 {
-                if start == 0 {
-                    self.first(len)
-                } else if start + len >= 8 {
-                    self.last(8-start)
-                } else {
-                    self & (((1 << len) - 1) << start)
+                match (start, start + len) {
+                    (0, _) => self.first(len),
+                    (_, l) if l >= 8 => self.last(8-start),
+                    _ => self & (((1 << len) - 1) << start)
                 }
             }
         }
     )
+}
+
+struct BitAttribute {
+    bits: syn::LitInt,
+}
+
+impl syn::parse::Parse for BitAttribute {
+    fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
+        let _: syn::Token![=] = input.parse()?;
+        let bits: syn::LitInt = input.parse()?;
+        Ok(Self { bits })
+    }
 }
 
 #[proc_macro_attribute]
@@ -113,6 +122,24 @@ pub fn bitfield(
         Item::Struct(s) => {
             let ident = &s.ident;
             let fields_ty = s.fields.iter().map(|field| &field.ty);
+            let bits_attrs_check = s
+                .fields
+                .iter()
+                .filter_map(|field| {
+                    let ty = &field.ty;
+                    let attrs = &field.attrs;
+                    for attr in attrs {
+                        if attr.path.is_ident("bits") {
+                            let bits = syn::parse2::<BitAttribute>(attr.tokens.clone()).ok()?.bits;
+                            return Some(
+                                quote::quote_spanned!(bits.span() => const _: [(); #bits] = [(); <#ty as Specifier>::BITS];),
+                            );
+                        }
+                    }
+                    None
+                })
+                .collect::<Vec<_>>();
+
             let get_sets = getters_setters(&s.fields);
             let size = quote!(0 #(+ <#fields_ty as Specifier>::BITS)*);
             let error = format!(
@@ -123,6 +150,8 @@ pub fn bitfield(
                 pub struct #ident {
                     data: [u8; ( #size ) / 8],
                 }
+
+                #(#bits_attrs_check)*
 
                 // Conditional consts and panic in const requires nightly
                 #[cfg(feature="nightly")]

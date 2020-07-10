@@ -31,14 +31,14 @@ pub trait Specifier {
         + std::ops::Shl<usize, Output = Self::IntType>
         + std::ops::Shr<usize, Output = Self::IntType>
         + std::ops::AddAssign
-        + std::ops::SubAssign;
+        + std::ops::ShrAssign<usize>;
     type Interface;
 
     fn to_interface(int_val: Self::IntType) -> Self::Interface;
     // fn to_int_type(interface: Self::Interface) -> Self::IntType;
 
     fn get(data: &[u8], mut offset: usize) -> Self::Interface {
-        let mut byte_idx = (offset + 1) / 8;
+        let mut byte_idx = offset / 8;
         offset %= 8;
         let mut remaining_bits = Self::BITS;
         let mut out: Self::IntType = Self::IntType::from(0);
@@ -58,7 +58,7 @@ pub trait Specifier {
     }
 
     fn set(data: &mut [u8], mut offset: usize, val: Self::Interface) {
-        let mut byte_idx = (offset + 1) / 8;
+        let mut byte_idx = offset / 8;
         offset %= 8;
         let bits = Self::BITS;
         let mut remaining_bits = bits;
@@ -70,11 +70,11 @@ pub trait Specifier {
                 val_int.last_byte()
             } else {
                 let previous_bits = data[byte_idx].first(offset);
-                let next_bits = data[byte_idx].last(8 - bits_in_current_byte);
+                let next_bits = data[byte_idx].last(8 - bits_in_current_byte - offset);
                 previous_bits + (val_int.last_byte() << offset) + next_bits
             };
             data[byte_idx] = new_byte;
-            val_int -= Self::IntType::from(new_byte) >> bits_in_current_byte;
+            val_int >>= bits_in_current_byte;
             remaining_bits -= bits_in_current_byte;
             byte_idx += 1;
             offset = 0;
