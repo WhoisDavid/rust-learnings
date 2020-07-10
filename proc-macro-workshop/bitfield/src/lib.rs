@@ -35,8 +35,13 @@ pub trait Specifier {
     type Interface;
 
     fn to_interface(int_val: Self::IntType) -> Self::Interface;
-    // fn to_int_type(interface: Self::Interface) -> Self::IntType;
 
+    /// Get a value on given on a slice of bytes given a certain offset and a number of bits (Self::BITS)
+    ///   offset
+    ///   ^^^^^
+    ///  |ABCDEFGH|IJKLMNOP| ==> FGHIJK
+    /// lsb    ^^^ ^^^         lsb
+    ///        BITS=6
     fn get(data: &[u8], mut offset: usize) -> Self::Interface {
         let mut byte_idx = offset / 8;
         offset %= 8;
@@ -47,6 +52,12 @@ pub trait Specifier {
             let new_byte: u8 = if bits_in_current_byte == 8 {
                 data[byte_idx]
             } else {
+                // Get the bits at given offset and shift right to
+                //  offset
+                //   ^^^^
+                //  |####XYZ#| ==> |XYZ00000|
+                // lsb   ^^^      lsb
+                //
                 data[byte_idx].mid(offset, bits_in_current_byte) >> offset
             };
             out += Self::IntType::from(new_byte) << (Self::BITS - remaining_bits);
@@ -57,6 +68,12 @@ pub trait Specifier {
         Self::to_interface(out)
     }
 
+    /// Set a value on a slice of bytes given a certain offset maintaining all other bits
+    ///   offset               val     offset
+    ///   ^^^^^               FOOBAR   ^^^^^
+    ///  |ABCDEFGH|IJKLMNOP|   ==>    |ABCDEFOO|BARLMNOP|
+    /// lsb                          lsb    ^^^ ^^^
+    ///                                       val
     fn set(data: &mut [u8], mut offset: usize, val: Self::Interface) {
         let mut byte_idx = offset / 8;
         offset %= 8;
@@ -69,9 +86,15 @@ pub trait Specifier {
                 // Truncates the u8 values
                 val_int.last_byte()
             } else {
-                let previous_bits = data[byte_idx].first(offset);
+                // Get the bits at given offset and shift right to
+                //   prev   next    prev   next
+                //   ^^^^   ^       ^^^^   ^
+                //  |ABCDEFGH| ==> |ABCDXYZH|
+                // lsb   ^^^      lsb   ^^^
+                //       slot           val
+                let prev_bits = data[byte_idx].first(offset);
                 let next_bits = data[byte_idx].last(8 - bits_in_current_byte - offset);
-                previous_bits + (val_int.last_byte() << offset) + next_bits
+                prev_bits + (val_int.last_byte() << offset) + next_bits
             };
             data[byte_idx] = new_byte;
             val_int >>= bits_in_current_byte;
