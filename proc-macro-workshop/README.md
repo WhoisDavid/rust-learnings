@@ -22,7 +22,8 @@ by other authors.*
     - Source: [seq-impl/src/lib.rs](seq-impl/src/lib.rs)
   - [x] [**Attribute macro:** `#[sorted]`](#attribute-macro-sorted)
     - Source: [sorted/src/lib.rs](sorted/src/lib.rs)
-  - [ ] [**Attribute macro:** `#[bitfield]`](#attribute-macro-bitfield)
+  - [x] [**Attribute macro:** `#[bitfield]`](#attribute-macro-bitfield)
+    - Source: [bitfield/impl/src/lib.rs](bitfield/impl/src/lib.rs) and [bitfield/src/lib.rs](bitfield/src/lib.rs)
 - [**Project recommendations**](#project-recommendations) — What to work on
     depending on your interests
 - [**Test harness**](#test-harness) — Explanation of how testing is set up

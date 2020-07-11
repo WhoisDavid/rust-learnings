@@ -17,8 +17,9 @@ pub use bitfield_impl::bitfield;
 pub use bitfield_impl::generate_bit_specifiers;
 pub use bitfield_impl::BitfieldSpecifier;
 
+/// Single method trait to extract the least significant byte from Self
 pub trait LastByte {
-    // Returns the last byte (least significant byte) of `Self`
+    /// Returns the last byte (least significant byte) of `Self`
     fn last_byte(self) -> u8;
 }
 
@@ -52,7 +53,7 @@ pub trait Specifier {
             let new_byte: u8 = if bits_in_current_byte == 8 {
                 data[byte_idx]
             } else {
-                // Get the bits at given offset and shift right to
+                // Get the bits at given offset and shift right to make first bit after the offset the lsb.
                 //  offset
                 //   ^^^^
                 //  |####XYZ#| ==> |XYZ00000|
@@ -105,6 +106,7 @@ pub trait Specifier {
     }
 }
 
+// Implement Specifier for bool type here since it is static
 impl Specifier for bool {
     const BITS: usize = 1;
     type IntType = u8;
@@ -114,7 +116,7 @@ impl Specifier for bool {
         match int_val {
             0 => false,
             1 => true,
-            _ => panic!("Should be 0 or 1"),
+            _ => panic!("Bool can only be converted from 0 or 1"),
         }
     }
 }
