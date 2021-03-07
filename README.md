@@ -5,6 +5,7 @@
 - [**Smart Pointers**](#smart-pointers)
 - [**Procedural macros workshop**](#procedural-macros-workshop)
 - [**Procedural macros playground**](#procedural-macros-playground)
+- [**Channel**](#Channel)
 
 ## Smart pointers
 
@@ -39,3 +40,12 @@ Toy repo to do some tests on proc macro syntax.
 
 *Project under [proc-macro-playground](proc-macro-playground).*
 
+## Channels
+
+Another great [Crust of Rust](https://www.youtube.com/watch?v=b4mS5UPHh20&list=PLqbS7AVVErFiWDOAVrPt7aYmnuuOLYvOa&index=5).
+
+Implementation of [`std::sync::mpsc::channel`](https://doc.rust-lang.org/std/sync/mpsc/fn.channel.html) in [`eurostar/src/lib.rs`](eurostar/src/lib.rs).
+
+This is a simple implementation of asynchronous/unbounded multi-producer single consumer (`mpsc`) channel using a `VecDeque` buffer, a `Mutex` and a `Condvar` behind an `Arc`. 
+
+*Project under [eurostar](eurostar).*
