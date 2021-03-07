@@ -5,7 +5,7 @@
 - [**Smart Pointers**](#smart-pointers)
 - [**Procedural macros workshop**](#procedural-macros-workshop)
 - [**Procedural macros playground**](#procedural-macros-playground)
-- [**Channel**](#Channel)
+- [**Channels**](#Channels)
 
 ## Smart pointers
 
